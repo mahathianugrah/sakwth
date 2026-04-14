@@ -217,6 +217,107 @@ body{
   transition:background var(--theme-transition),color var(--theme-transition);
 }
 
+
+/* ══════════════════════════════════════════════════
+   INTRO — smooth zoom into the "6"
+══════════════════════════════════════════════════ */
+body.intro-active{ overflow:hidden; }
+
+#intro-overlay{
+  position:fixed;inset:0;z-index:99999;
+  background:#050f0d;
+  overflow:hidden;
+  pointer-events:all;
+}
+#intro-overlay::before{
+  content:'';position:absolute;inset:0;pointer-events:none;
+  background-image:
+    linear-gradient(rgba(0,137,123,0.07) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(0,137,123,0.07) 1px,transparent 1px);
+  background-size:60px 60px;
+  mask-image:radial-gradient(ellipse 70% 70% at 50% 50%,black 0%,transparent 100%);
+}
+#intro-orb{
+  position:absolute;width:700px;height:700px;border-radius:50%;
+  background:radial-gradient(circle,rgba(0,137,123,0.2) 0%,transparent 68%);
+  top:50%;left:50%;transform:translate(-50%,-50%);
+  pointer-events:none;
+  animation:iOrbPulse 4s ease-in-out infinite;
+}
+@keyframes iOrbPulse{
+  0%,100%{transform:translate(-50%,-50%) scale(1);}
+  50%    {transform:translate(-50%,-50%) scale(1.2);}
+}
+#intro-stage{
+  position:absolute;
+  top:50%;left:50%;
+  transform:translate(-50%,-50%);
+  display:flex;flex-direction:column;align-items:center;
+  pointer-events:none;
+}
+#intro-wordmark{
+  font-family:'Nunito',sans-serif;font-weight:900;
+  font-size:clamp(60px,12vw,128px);
+  line-height:1;white-space:nowrap;
+  display:flex;align-items:baseline;
+  opacity:0;
+  animation:iWordIn 1s cubic-bezier(0.34,1.4,0.64,1) 0.4s forwards;
+  will-change:transform,opacity;
+  user-select:none;
+}
+@keyframes iWordIn{
+  from{opacity:0;transform:translateY(18px) scale(0.78);}
+  to  {opacity:1;transform:translateY(0)    scale(1);}
+}
+#intro-six  { color:#4db6ac; display:inline-block; }
+#intro-am   { color:#4db6ac; display:inline-block; }
+#intro-fresh{ color:#ffffff; display:inline-block; }
+#intro-dot  {
+  display:inline-block;
+  width:clamp(8px,1.2vw,14px);height:clamp(8px,1.2vw,14px);
+  border-radius:50%;background:#00e5cc;
+  margin-left:4px;margin-bottom:clamp(6px,1vw,13px);
+  box-shadow:0 0 16px rgba(0,229,204,0.9);
+  animation:iDotGlow 2s ease-in-out infinite 1.5s;
+}
+@keyframes iDotGlow{
+  0%,100%{transform:scale(1);   box-shadow:0 0 16px rgba(0,229,204,0.9);}
+  50%    {transform:scale(1.8); box-shadow:0 0 50px rgba(0,229,204,1);}
+}
+#intro-tagline{
+  margin-top:20px;
+  font-family:'Plus Jakarta Sans',sans-serif;
+  font-size:clamp(10px,1.3vw,14px);
+  font-weight:600;letter-spacing:4.5px;text-transform:uppercase;
+  color:#8bbab3;
+  opacity:0;
+  animation:iTagIn 0.8s ease 1.2s forwards;
+  white-space:nowrap;
+}
+@keyframes iTagIn{to{opacity:1;}}
+
+#intro-hint{
+  position:absolute;bottom:8%;left:50%;transform:translateX(-50%);
+  z-index:3;display:flex;flex-direction:column;align-items:center;gap:10px;
+  color:#8bbab3;font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;
+  opacity:0;transition:opacity 1s;pointer-events:none;
+  white-space:nowrap;
+}
+#intro-hint.show{opacity:1;}
+.i-chevrons{display:flex;flex-direction:column;align-items:center;gap:4px;}
+.i-chev{
+  width:12px;height:12px;
+  border-top:2px solid #4db6ac;border-right:2px solid #4db6ac;
+  transform:rotate(-45deg);
+  animation:iChev 1.5s ease-in-out infinite;
+}
+.i-chev:nth-child(2){animation-delay:0.18s;opacity:0.6;}
+.i-chev:nth-child(3){animation-delay:0.36s;opacity:0.3;}
+@keyframes iChev{
+  0%,100%{transform:rotate(-45deg) translate(0,0);opacity:0.9;}
+  50%    {transform:rotate(-45deg) translate(-4px,-4px);opacity:0.3;}
+}
+
 /* ═══════════════════════════════════════════
    CURSOR SYSTEM — 3 styles (fixed)
 ═══════════════════════════════════════════ */
@@ -388,12 +489,13 @@ body.day-mode .nav-links a:hover{color:var(--teal-xl);}
 /* ── TICKER ── */
 .ticker{
   background:rgba(0,137,123,0.12);border-bottom:1px solid rgba(0,137,123,0.2);
-  padding:10px 0;overflow:hidden;position:relative;z-index:50;margin-top:72px;
+  padding:10px 0;overflow:hidden;position:relative;z-index:50;
+  /* margin-top is set dynamically by JS to match nav height */
   transition:background var(--theme-transition);
 }
 .ticker-inner{
   display:flex;gap:48px;
-  animation:ticker 20s linear infinite;
+  animation:ticker 13s linear infinite;
   white-space:nowrap;
 }
 @keyframes ticker{from{transform:translateX(0);}to{transform:translateX(-50%);}}
@@ -405,7 +507,10 @@ body.day-mode .nav-links a:hover{color:var(--teal-xl);}
 
 /* ── HERO ── */
 .hero{
-  position:relative;height:calc(100vh - 72px);
+  position:relative;
+  /* height accounts for nav + ticker (~40px) */
+  height:calc(100vh - 72px - 41px);
+  min-height:520px;
   display:flex;align-items:center;
   overflow:hidden;
 }
@@ -613,14 +718,18 @@ body.day-mode .section-h2{color:var(--teal-xl);}
 
 /* ── PRODUCTS ── */
 .products-section{background:var(--dark);}
-.cat-tabs{display:flex;gap:8px;margin:40px 0 32px;flex-wrap:wrap;}
-.cat-tab{
-  padding:10px 22px;border-radius:50px;border:1.5px solid rgba(0,137,123,0.2);
-  background:transparent;color:var(--muted);font-size:13px;font-weight:600;cursor:pointer!important;
-  transition:all 0.2s;font-family:'Plus Jakarta Sans',sans-serif;
+.cat-tabs{display:none;}
+.products-grid{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:20px;
+  max-height:calc(2 * 300px + 20px);
+  overflow-y:auto;
+  padding-right:6px;
+  scrollbar-width:thin;
+  scrollbar-color:var(--teal) transparent;
 }
-.cat-tab.active,.cat-tab:hover{background:var(--teal);color:#fff;border-color:var(--teal);}
-.products-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;}
+.products-grid::-webkit-scrollbar{width:5px;}
+.products-grid::-webkit-scrollbar-track{background:transparent;}
+.products-grid::-webkit-scrollbar-thumb{background:var(--teal);border-radius:4px;}
 .product-card{
   background:var(--card-bg);border:1px solid rgba(0,137,123,0.15);
   border-radius:20px;overflow:hidden;
@@ -766,6 +875,9 @@ body.day-mode .testi-name{color:var(--teal-xl);}
 
 /* ── APP SECTION ── */
 .app-section{background:var(--dark);padding:100px 5%;position:relative;overflow:hidden;}
+@media(max-width:768px){
+  .app-section{overflow:visible;}
+}
 .app-inner{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center;}
 .app-phones{position:relative;height:500px;display:flex;align-items:center;justify-content:center;}
 .phone-mockup{
@@ -1231,7 +1343,7 @@ body.day-mode .su-social-btn{background:rgba(255,255,255,0.6);}
   .nav-cursor-picker{display:none;}
   .nav-right-group{gap:6px;}
   .nav-signup-btn{display:none;}
-  .ticker{margin-top:64px;}
+  .ticker{margin-top:0;}
 }
 
 /* ── MOBILE NAV BURGER ── */
@@ -1284,7 +1396,7 @@ body.day-mode .su-social-btn{background:rgba(255,255,255,0.6);}
 @media(max-width:1024px){
   .hero-content{grid-template-columns:1fr;gap:0;padding-top:20px;}
   .hero-right{display:none;}
-  .hero{height:auto;min-height:calc(100vh - 64px);padding:40px 4% 60px;}
+  .hero{height:auto !important;min-height:0;padding:40px 4% 60px;}
   .hero-h1{font-size:clamp(36px,8vw,60px);}
   .hero-sub{font-size:15px;max-width:100%;}
   .hero-stats{gap:24px;flex-wrap:wrap;}
@@ -1337,23 +1449,21 @@ body.day-mode .su-social-btn{background:rgba(255,255,255,0.6);}
 
 /* ══ PRODUCTS ══ */
 @media(max-width:1024px){
-  .products-grid{grid-template-columns:repeat(3,1fr);gap:16px;}
+  /* 3 cols → 2 rows = 6 cards visible */
+  .products-grid{grid-template-columns:repeat(3,1fr);gap:16px;max-height:calc(2*(180px + 100px + 16px));}
 }
 @media(max-width:768px){
-  .products-grid{grid-template-columns:repeat(2,1fr);gap:14px;}
-  .cat-tabs{gap:6px;margin:28px 0 20px;}
-  .cat-tab{padding:8px 16px;font-size:12px;}
+  /* 2 cols → 2 rows = 4 cards visible */
+  .products-grid{grid-template-columns:repeat(2,1fr);gap:14px;max-height:calc(2*(160px + 100px + 14px));}
 }
 @media(max-width:480px){
-  .products-grid{grid-template-columns:repeat(2,1fr);gap:10px;}
-  .cat-tab{padding:7px 12px;font-size:11px;}
+  .products-grid{grid-template-columns:repeat(2,1fr);gap:10px;max-height:calc(2*(130px + 90px + 10px));}
   .product-img{height:130px;font-size:52px;}
   .product-name{font-size:13px;}
   .product-price{font-size:16px;}
 }
 @media(max-width:360px){
-  .products-grid{grid-template-columns:1fr 1fr;}
-  .cat-tab{padding:6px 10px;font-size:10px;}
+  .products-grid{grid-template-columns:1fr 1fr;max-height:calc(2*(120px + 88px + 10px));}
 }
 
 /* ══ HOW IT WORKS ══ */
@@ -1407,23 +1517,56 @@ body.day-mode .su-social-btn{background:rgba(255,255,255,0.6);}
 /* ══ APP SECTION ══ */
 @media(max-width:1024px){
   .app-inner{grid-template-columns:1fr;gap:48px;}
-  .app-phones{height:320px;order:-1;}
-  .phone-mockup.front{transform:rotate(-4deg) translateX(-10px) scale(0.85);}
-  .phone-mockup.back{transform:rotate(6deg) translateX(10px) scale(0.85);}
+  .app-phones{height:380px;order:-1;}
+  .phone-mockup.front{transform:rotate(-5deg) translateX(-18px);}
+  .phone-mockup.back{transform:rotate(7deg) translateX(18px) translateY(16px);}
 }
 @media(max-width:768px){
-  .app-phones{height:260px;}
+  .app-phones{
+    height:360px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    overflow:visible;
+  }
+  .phone-mockup{
+    width:170px;
+    height:300px;
+    border-radius:32px;
+    position:absolute;
+  }
+  .phone-mockup.front{transform:rotate(-5deg) translateX(-22px);}
+  .phone-mockup.back{transform:rotate(7deg) translateX(22px) translateY(14px);}
+  .phone-screen{padding:16px;}
+  .phone-logo{font-size:16px;margin-bottom:6px;}
+  .phone-bal{padding:12px;margin:8px 0;border-radius:14px;}
+  .phone-bal-val{font-size:20px;}
+  .phone-bal-lbl{font-size:9px;}
+  .phone-items{gap:6px;}
+  .phone-item{padding:8px;}
+  .pi-emoji{font-size:16px;}
+  .pi-name{font-size:10px;}
+  .pi-price{font-size:9px;}
   .app-download{flex-direction:column;gap:10px;}
   .app-btn{justify-content:center;}
-  .phone-mockup{width:180px;height:360px;}
 }
 @media(max-width:480px){
-  .app-phones{height:220px;}
-  .phone-mockup{width:150px;height:300px;}
+  .app-phones{height:320px;overflow:visible;}
+  .phone-mockup{width:155px;height:275px;border-radius:28px;}
+  .phone-mockup.front{transform:rotate(-5deg) translateX(-20px);}
+  .phone-mockup.back{transform:rotate(7deg) translateX(20px) translateY(12px);}
+  .phone-screen{padding:14px;}
+  .phone-bal-val{font-size:18px;}
   .app-feature{padding:14px;}
   .af-icon{width:40px;height:40px;font-size:18px;border-radius:12px;}
   .af-title{font-size:13px;}
   .af-desc{font-size:12px;}
+}
+@media(max-width:360px){
+  .app-phones{height:290px;}
+  .phone-mockup{width:135px;height:245px;border-radius:24px;}
+  .phone-mockup.front{transform:rotate(-4deg) translateX(-16px);}
+  .phone-mockup.back{transform:rotate(6deg) translateX(16px) translateY(10px);}
 }
 
 /* ══ COMMUNITY ══ */
@@ -1549,6 +1692,15 @@ body.day-mode .su-social-btn{background:rgba(255,255,255,0.6);}
   nav{padding-left:max(20px,env(safe-area-inset-left));padding-right:max(20px,env(safe-area-inset-right));}
   .mobile-menu{padding-left:max(20px,env(safe-area-inset-left));padding-right:max(20px,env(safe-area-inset-right));}
   footer{padding-bottom:max(24px,env(safe-area-inset-bottom));}
+  body{padding-bottom:env(safe-area-inset-bottom);}
+}
+
+/* ══ LANDSCAPE ORIENTATION fix — prevent layout break ══ */
+@media(max-width:900px) and (orientation:landscape){
+  .hero{min-height:auto;padding:20px 5% 40px;}
+  .hero-h1{font-size:clamp(26px,5vw,44px);}
+  .hero-stats{margin-top:20px;padding-top:16px;}
+  .mobile-menu{max-height:70vh;overflow-y:auto;}
 }
 
 /* ══ TOUCH IMPROVEMENTS ══ */
@@ -1588,6 +1740,258 @@ body.day-mode .su-social-btn{background:rgba(255,255,255,0.6);}
   .su-field-row{grid-template-columns:1fr;}
   .signup-modal{padding:24px 18px;}
 }
+
+/* ── CAREERS SECTION ── */
+.careers-section{
+  padding:100px 5%;background:var(--dark);
+  position:relative;overflow:hidden;
+  transition:background var(--theme-transition);
+}
+.careers-section::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,var(--teal),transparent);
+}
+body.day-mode .careers-section{background:var(--dark2);}
+
+/* Perks strip */
+.careers-perks{
+  display:flex;gap:14px;flex-wrap:wrap;margin-bottom:60px;
+}
+.careers-perk{
+  display:flex;align-items:center;gap:10px;
+  background:rgba(0,137,123,0.1);
+  border:1px solid rgba(0,137,123,0.25);
+  border-radius:50px;padding:10px 20px;
+  font-size:13px;font-weight:600;color:var(--teal-l);
+  transition:all 0.25s;
+}
+body.day-mode .careers-perk{background:rgba(0,137,123,0.08);color:var(--teal-xl);}
+.careers-perk:hover{background:rgba(0,137,123,0.18);transform:translateY(-2px);}
+.careers-perk-dot{width:7px;height:7px;border-radius:50%;background:var(--accent);flex-shrink:0;}
+
+/* Role cards grid */
+.careers-grid{
+  display:grid;grid-template-columns:repeat(2,1fr);gap:24px;margin-bottom:60px;
+}
+@media(max-width:768px){.careers-grid{grid-template-columns:1fr;}}
+
+.career-card{
+  background:rgba(255,255,255,0.03);
+  border:1px solid rgba(0,137,123,0.18);
+  border-radius:24px;padding:36px;
+  position:relative;overflow:hidden;
+  transition:all 0.4s cubic-bezier(0.34,1.56,0.64,1);
+  cursor:pointer!important;
+}
+body.day-mode .career-card{background:rgba(255,255,255,0.75);border-color:rgba(0,137,123,0.15);}
+.career-card::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(circle at 50% 0%,rgba(0,137,123,0.1),transparent 65%);
+  opacity:0;transition:opacity 0.3s;
+}
+.career-card:hover{transform:translateY(-6px) scale(1.01);border-color:rgba(0,229,204,0.4);}
+.career-card:hover::before{opacity:1;}
+
+/* Highlight card */
+.career-card.featured{
+  border-color:rgba(0,137,123,0.5);
+  background:rgba(0,137,123,0.06);
+}
+body.day-mode .career-card.featured{background:rgba(0,137,123,0.08);}
+.career-card.featured::after{
+  content:'HIRING NOW';
+  position:absolute;top:20px;right:20px;
+  background:var(--teal);color:#fff;
+  font-size:9px;font-weight:800;letter-spacing:1.5px;
+  padding:4px 12px;border-radius:20px;
+}
+
+.career-role-icon{
+  width:52px;height:52px;border-radius:16px;
+  background:rgba(0,137,123,0.15);
+  display:flex;align-items:center;justify-content:center;
+  font-size:26px;margin-bottom:20px;
+  border:1px solid rgba(0,137,123,0.2);
+}
+body.day-mode .career-role-icon{background:rgba(0,137,123,0.1);}
+
+.career-role-title{
+  font-family:'Nunito',sans-serif;
+  font-size:22px;font-weight:900;color:var(--white);margin-bottom:6px;
+}
+body.day-mode .career-role-title{color:var(--teal-xl);}
+
+.career-role-sub{
+  font-size:13px;color:var(--teal-l);font-weight:600;
+  margin-bottom:16px;
+}
+
+.career-role-desc{
+  font-size:13px;color:var(--muted);line-height:1.75;margin-bottom:24px;
+}
+
+/* Tags row */
+.career-tags{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:24px;}
+.career-tag{
+  background:rgba(0,137,123,0.12);color:var(--teal-l);
+  font-size:11px;font-weight:700;padding:5px 14px;border-radius:20px;
+  letter-spacing:0.4px;
+}
+body.day-mode .career-tag{background:rgba(0,137,123,0.1);color:var(--teal-xl);}
+
+/* Responsibilities list */
+.career-list{list-style:none;margin-bottom:28px;}
+.career-list li{
+  display:flex;align-items:flex-start;gap:10px;
+  font-size:13px;color:var(--muted);line-height:1.6;
+  padding:6px 0;border-bottom:1px solid rgba(0,137,123,0.08);
+}
+.career-list li:last-child{border-bottom:none;}
+.career-list li::before{
+  content:'→';color:var(--accent);font-weight:700;
+  flex-shrink:0;margin-top:1px;
+}
+
+/* Earnings bar */
+.career-earn{
+  display:flex;align-items:center;justify-content:space-between;
+  background:rgba(0,137,123,0.1);border:1px solid rgba(0,137,123,0.2);
+  border-radius:14px;padding:14px 18px;margin-bottom:24px;
+}
+body.day-mode .career-earn{background:rgba(0,137,123,0.07);}
+.career-earn-lbl{font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:1px;}
+.career-earn-val{
+  font-family:'Nunito',sans-serif;font-size:22px;font-weight:900;
+  color:var(--accent);
+}
+
+/* Apply button */
+.career-apply-btn{
+  width:100%;padding:14px;border-radius:50px;border:none;
+  background:var(--teal);color:#fff;
+  font-size:14px;font-weight:700;cursor:pointer!important;
+  font-family:'Plus Jakarta Sans',sans-serif;
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  transition:all 0.25s;
+  box-shadow:0 0 30px rgba(0,137,123,0.2);
+}
+.career-apply-btn:hover{background:var(--teal-d);transform:translateY(-2px);box-shadow:0 12px 32px rgba(0,137,123,0.35);}
+
+/* Application modal */
+.apply-overlay{
+  position:fixed;inset:0;z-index:2000;
+  background:rgba(0,0,0,0.75);backdrop-filter:blur(12px);
+  display:flex;align-items:center;justify-content:center;padding:20px;
+  opacity:0;pointer-events:none;transition:opacity 0.3s;
+}
+.apply-overlay.open{opacity:1;pointer-events:all;}
+
+.apply-modal{
+  background:var(--dark2);
+  border:1px solid rgba(0,137,123,0.3);
+  border-radius:28px;padding:40px;
+  width:100%;max-width:520px;
+  max-height:90vh;overflow-y:auto;
+  position:relative;
+  box-shadow:0 32px 80px rgba(0,0,0,0.5),0 0 60px rgba(0,137,123,0.1);
+  transform:translateY(20px);transition:transform 0.3s;
+}
+body.day-mode .apply-modal{background:#f7fdfb;border-color:rgba(0,137,123,0.2);}
+.apply-overlay.open .apply-modal{transform:translateY(0);}
+
+.apply-close{
+  position:absolute;top:18px;right:18px;
+  background:rgba(255,255,255,0.06);border:none;
+  width:36px;height:36px;border-radius:50%;
+  color:var(--muted);font-size:16px;cursor:pointer!important;
+  display:flex;align-items:center;justify-content:center;
+  transition:all 0.2s;
+}
+.apply-close:hover{background:rgba(255,0,0,0.15);color:#ff6b6b;}
+body.day-mode .apply-close{background:rgba(0,0,0,0.06);}
+
+.apply-role-badge{
+  display:inline-flex;align-items:center;gap:8px;
+  background:rgba(0,137,123,0.12);border:1px solid rgba(0,137,123,0.25);
+  border-radius:50px;padding:6px 16px;margin-bottom:20px;
+  font-size:11px;font-weight:700;color:var(--teal-l);letter-spacing:1px;
+  text-transform:uppercase;
+}
+.apply-title{
+  font-family:'Nunito',sans-serif;font-size:26px;font-weight:900;
+  color:var(--white);margin-bottom:6px;
+}
+body.day-mode .apply-title{color:var(--teal-xl);}
+.apply-subtitle{font-size:13px;color:var(--muted);margin-bottom:28px;line-height:1.6;}
+
+/* Form fields */
+.apply-field{margin-bottom:16px;}
+.apply-field label{
+  display:block;font-size:12px;font-weight:700;
+  color:var(--muted);letter-spacing:0.5px;margin-bottom:7px;
+}
+.apply-field input,
+.apply-field select,
+.apply-field textarea{
+  width:100%;padding:12px 16px;
+  background:rgba(255,255,255,0.05);
+  border:1.5px solid rgba(0,137,123,0.2);
+  border-radius:12px;color:var(--text);
+  font-size:14px;font-family:'Plus Jakarta Sans',sans-serif;
+  transition:border-color 0.2s;outline:none;
+}
+body.day-mode .apply-field input,
+body.day-mode .apply-field select,
+body.day-mode .apply-field textarea{
+  background:rgba(0,137,123,0.04);color:var(--teal-xl);
+}
+.apply-field input:focus,
+.apply-field select:focus,
+.apply-field textarea:focus{border-color:var(--teal);}
+.apply-field textarea{resize:vertical;min-height:90px;}
+.apply-field select option{background:var(--dark2);color:var(--text);}
+
+.apply-field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+@media(max-width:480px){.apply-field-row{grid-template-columns:1fr;}}
+
+.apply-submit{
+  width:100%;padding:15px;border-radius:50px;border:none;
+  background:var(--teal);color:#fff;
+  font-size:15px;font-weight:700;cursor:pointer!important;
+  font-family:'Plus Jakarta Sans',sans-serif;
+  margin-top:8px;transition:all 0.25s;
+  box-shadow:0 0 30px rgba(0,137,123,0.2);
+}
+.apply-submit:hover{background:var(--teal-d);transform:translateY(-2px);box-shadow:0 12px 32px rgba(0,137,123,0.35);}
+
+/* Process steps */
+.careers-process{
+  background:rgba(0,137,123,0.06);
+  border:1px solid rgba(0,137,123,0.15);
+  border-radius:24px;padding:40px;margin-top:0;
+}
+body.day-mode .careers-process{background:rgba(0,137,123,0.05);}
+.careers-process-title{
+  font-family:'Nunito',sans-serif;font-size:20px;font-weight:800;
+  color:var(--white);margin-bottom:28px;
+}
+body.day-mode .careers-process-title{color:var(--teal-xl);}
+.careers-process-steps{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:20px;
+}
+@media(max-width:768px){.careers-process-steps{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:480px){.careers-process-steps{grid-template-columns:1fr;}}
+.cp-step{text-align:center;}
+.cp-num{
+  width:44px;height:44px;border-radius:50%;
+  background:var(--teal);color:#fff;
+  font-family:'Nunito',sans-serif;font-size:16px;font-weight:900;
+  display:flex;align-items:center;justify-content:center;
+  margin:0 auto 12px;
+}
+.cp-label{font-size:13px;font-weight:700;color:var(--white);margin-bottom:4px;}
+body.day-mode .cp-label{color:var(--teal-xl);}
+.cp-desc{font-size:11px;color:var(--muted);line-height:1.5;}
 
 /* ── VENDING MACHINE BANNER ── */
 .vending-banner{
@@ -1667,6 +2071,141 @@ body.day-mode .vc-title{color:var(--teal-xl);}
 </div>
 
 <!-- ── CURSORS — flat fixed elements, moved directly by JS ── -->
+
+<!-- ═══════════════════════════════════════════
+     INTRO OVERLAY — scroll to zoom into "6"
+═══════════════════════════════════════════ -->
+<div id="intro-overlay">
+  <div id="intro-orb"></div>
+
+  <div id="intro-stage">
+    <div id="intro-wordmark">
+      <span id="intro-six">6</span><span id="intro-am">am</span><span id="intro-fresh">fresh</span><span id="intro-dot"></span>
+    </div>
+    <div id="intro-tagline">Start Fresh &nbsp;&middot;&nbsp; Stay Fresh</div>
+  </div>
+
+  <div id="intro-hint">
+    <div class="i-chevrons">
+      <div class="i-chev"></div>
+      <div class="i-chev"></div>
+      <div class="i-chev"></div>
+    </div>
+    <span>Scroll to enter</span>
+  </div>
+</div>
+
+<script>
+(function(){
+  var overlay = document.getElementById('intro-overlay');
+  var stage   = document.getElementById('intro-stage');
+  var tagline = document.getElementById('intro-tagline');
+  var hint    = document.getElementById('intro-hint');
+  var six     = document.getElementById('intro-six');
+
+  document.body.classList.add('intro-active');
+
+  /* ── Pin transform-origin to exact pixel centre of the "6" ── */
+  function pinOrigin(){
+    var sr = stage.getBoundingClientRect();
+    var xr = six.getBoundingClientRect();
+    var cx = (xr.left + xr.width  / 2) - sr.left;
+    var cy = (xr.top  + xr.height / 2) - sr.top;
+    stage.style.transformOrigin = cx + 'px ' + cy + 'px';
+  }
+  setTimeout(function(){ pinOrigin(); hint.classList.add('show'); }, 1400);
+  window.addEventListener('resize', pinOrigin, {passive:true});
+
+  /* ── Animation state ── */
+  var currentScale = 1;
+  var targetScale  = 1;
+  var MAX_SCALE    = 90;
+  var LERP         = 0.075;   /* smoothing — lower = silkier */
+  var done         = false;
+  var rafId        = null;
+
+  var scrollAcc  = 0;
+  var MAX_SCROLL = 420;
+
+  /* ── RAF loop — runs every frame for smooth lerp ── */
+  function tick(){
+    if(done) return;
+
+    /* smooth glide toward target */
+    currentScale += (targetScale - currentScale) * LERP;
+
+    stage.style.transform = 'translate(-50%,-50%) scale(' + currentScale + ')';
+
+    var p = Math.min((currentScale - 1) / (MAX_SCALE - 1), 1);
+
+    /* fade out text */
+    var textFade = Math.max(0, 1 - p * 8);
+    tagline.style.opacity = textFade;
+    hint.style.opacity    = textFade;
+
+    /* fade overlay from 70% onward */
+    if(p > 0.70){
+      overlay.style.opacity = String(Math.max(0, 1 - (p - 0.70) / 0.30));
+    }
+
+    if(currentScale >= MAX_SCALE * 0.97 && !done){
+      done = true; finish(); return;
+    }
+    rafId = requestAnimationFrame(tick);
+  }
+
+  function startLoop(){ if(!rafId) rafId = requestAnimationFrame(tick); }
+
+  function pushScroll(delta){
+    if(done) return;
+    scrollAcc   = Math.min(scrollAcc + delta, MAX_SCROLL);
+    var raw     = scrollAcc / MAX_SCROLL;
+    var eased   = raw * raw * raw;        /* cubic ease-in → explosive at end */
+    targetScale = 1 + eased * (MAX_SCALE - 1);
+    startLoop();
+  }
+
+  function finish(){
+    cancelAnimationFrame(rafId); rafId = null;
+    overlay.style.transition = 'opacity 0.4s ease';
+    overlay.style.opacity    = '0';
+    document.body.classList.remove('intro-active');
+    setTimeout(function(){ overlay.style.display = 'none'; }, 450);
+    cleanup();
+  }
+
+  /* ── Wheel (desktop) ── */
+  function onWheel(e){
+    if(done) return;
+    if(e.deltaY <= 0) return;
+    e.preventDefault();
+    pushScroll(e.deltaY);
+  }
+
+  /* ── Touch (mobile) ── */
+  var lastY = null;
+  function onTouchStart(e){ lastY = e.touches[0].clientY; }
+  function onTouchMove(e){
+    if(done || lastY === null) return;
+    var dy = lastY - e.touches[0].clientY;
+    lastY  = e.touches[0].clientY;
+    if(dy <= 0) return;
+    e.preventDefault();
+    pushScroll(dy * 3.5);
+  }
+
+  function cleanup(){
+    window.removeEventListener('wheel',      onWheel,      {passive:false});
+    window.removeEventListener('touchstart', onTouchStart, {passive:true});
+    window.removeEventListener('touchmove',  onTouchMove,  {passive:false});
+  }
+
+  window.addEventListener('wheel',      onWheel,      {passive:false});
+  window.addEventListener('touchstart', onTouchStart, {passive:true});
+  window.addEventListener('touchmove',  onTouchMove,  {passive:false});
+})();
+</script>
+
 <div id="cursorDot"></div>
 <div id="cursorRing"></div>
 <div id="cursorLeaf" style="display:none"></div>
@@ -1844,15 +2383,6 @@ body.day-mode .vc-title{color:var(--teal-xl);}
       <div class="section-tag">Fresh Today</div>
       <h2 class="section-h2">Everything You Need,<br><em>Right Here.</em></h2>
       <p class="section-sub">5000+ products restocked every 6AM. Farm fresh vegetables, dairy, snacks and more — delivered in 5 minutes.</p>
-    </div>
-    <div class="cat-tabs" id="catTabs">
-      <button class="cat-tab active" onclick="filterProducts('all',this)">All</button>
-      <button class="cat-tab" onclick="filterProducts('dairy',this)">Dairy</button>
-      <button class="cat-tab" onclick="filterProducts('veggies',this)">Vegetables</button>
-      <button class="cat-tab" onclick="filterProducts('fruits',this)">Fruits</button>
-      <button class="cat-tab" onclick="filterProducts('snacks',this)">Snacks</button>
-      <button class="cat-tab" onclick="filterProducts('bakery',this)">Bakery</button>
-      <button class="cat-tab" onclick="filterProducts('drinks',this)">🧃 Drinks</button>
     </div>
     <div class="products-grid" id="productsGrid"></div>
   </div>
@@ -2065,6 +2595,179 @@ body.day-mode .vc-title{color:var(--teal-xl);}
   </div>
 </div>
 
+<!-- CAREERS -->
+<section class="careers-section section" id="careers">
+  <div class="section-inner">
+
+    <div class="reveal">
+      <div class="section-tag">Join the Team</div>
+      <h2 class="section-h2">Grow With <em>6am Fresh.</em></h2>
+      <p class="section-sub">We're building Hyderabad's fastest grocery network — and we need great people on the ground. No experience needed. Just energy, honesty, and a willingness to hustle.</p>
+    </div>
+
+    <!-- Perks strip -->
+    <div class="careers-perks reveal">
+      <div class="careers-perk"><span class="careers-perk-dot"></span> Weekly Salary</div>
+      <div class="careers-perk"><span class="careers-perk-dot"></span> ₹500/day guaranteed</div>
+      <div class="careers-perk"><span class="careers-perk-dot"></span> Flexible shifts</div>
+      <div class="careers-perk"><span class="careers-perk-dot"></span> In-building work only</div>
+      <div class="careers-perk"><span class="careers-perk-dot"></span> Earn bonuses</div>
+      <div class="careers-perk"><span class="careers-perk-dot"></span> Growth to team lead</div>
+    </div>
+
+    <!-- Role cards -->
+    <div class="careers-grid">
+
+      <!-- Delivery Boy -->
+      <div class="career-card featured reveal reveal-delay-1">
+        <div class="career-role-icon">🛗</div>
+        <div class="career-role-title">Quick Fresh Rider</div>
+        <div class="career-role-sub">Delivery Partner · Full-time / Part-time</div>
+        <div class="career-role-desc">
+          You're the hero of the 5-minute promise. Pick orders from the store, take the lift, and deliver to the resident's door. No bike. No traffic. Just the elevator.
+        </div>
+        <div class="career-tags">
+          <span class="career-tag">In-Building</span>
+          <span class="career-tag">No Bike Needed</span>
+          <span class="career-tag">6AM – 10PM Shifts</span>
+        </div>
+        <ul class="career-list">
+          <li>Pick packed orders from the in-building store</li>
+          <li>Deliver to residents within 5 minutes via lift</li>
+          <li>Handle wallet/UPI payments on delivery</li>
+          <li>Maintain order accuracy and freshness</li>
+          <li>Assist with morning restock (6AM shift)</li>
+        </ul>
+        <div class="career-earn">
+          <div>
+            <div class="career-earn-lbl">Monthly Earnings</div>
+            <div style="font-size:11px;color:var(--muted);margin-top:2px;">Base + per-order bonus</div>
+          </div>
+          <div class="career-earn-val">₹12,000 – ₹18,000</div>
+        </div>
+        <button class="career-apply-btn" onclick="openApply('Quick Fresh Rider', '🛗')">
+          Apply Now →
+        </button>
+      </div>
+
+      <!-- Store Incharge -->
+      <div class="career-card featured reveal reveal-delay-2">
+        <div class="career-role-icon">🏪</div>
+        <div class="career-role-title">Store Incharge</div>
+        <div class="career-role-sub">Operations · Full-time</div>
+        <div class="career-role-desc">
+          You run the mini-store inside the building. Stock management, order packing, coordinating with riders, and ensuring everything is fresh and sorted every day.
+        </div>
+        <div class="career-tags">
+          <span class="career-tag">Leadership Role</span>
+          <span class="career-tag">Stock Management</span>
+          <span class="career-tag">Morning + Evening</span>
+        </div>
+        <ul class="career-list">
+          <li>Manage daily stock — receive, sort, and shelve fresh items at 6AM</li>
+          <li>Pack orders accurately and hand off to riders</li>
+          <li>Track inventory via the 6am Fresh dashboard app</li>
+          <li>Coordinate with central warehouse for restocking</li>
+          <li>Handle resident complaints and quality issues on the spot</li>
+          <li>Manage 2–4 riders during peak hours</li>
+        </ul>
+        <div class="career-earn">
+          <div>
+            <div class="career-earn-lbl">Monthly Earnings</div>
+            <div style="font-size:11px;color:var(--muted);margin-top:2px;">Base + performance bonus</div>
+          </div>
+          <div class="career-earn-val">₹18,000 – ₹25,000</div>
+        </div>
+        <button class="career-apply-btn" onclick="openApply('Store Incharge', '🏪')">
+          Apply Now →
+        </button>
+      </div>
+
+    </div><!-- /careers-grid -->
+
+    <!-- Hiring process -->
+    <div class="careers-process reveal">
+      <div class="careers-process-title">⚡ How We Hire — It's Simple</div>
+      <div class="careers-process-steps">
+        <div class="cp-step">
+          <div class="cp-num">1</div>
+          <div class="cp-label">Apply Online</div>
+          <div class="cp-desc">Fill the form below. Takes 2 minutes. No resume needed.</div>
+        </div>
+        <div class="cp-step">
+          <div class="cp-num">2</div>
+          <div class="cp-label">WhatsApp Call</div>
+          <div class="cp-desc">Our team calls you within 24 hours for a quick chat.</div>
+        </div>
+        <div class="cp-step">
+          <div class="cp-num">3</div>
+          <div class="cp-label">1-Day Trial</div>
+          <div class="cp-desc">Come in for a single day. Paid. No pressure. See if you like it.</div>
+        </div>
+        <div class="cp-step">
+          <div class="cp-num">4</div>
+          <div class="cp-label">Start Earning</div>
+          <div class="cp-desc">If it's a fit — you're in. First salary within the week.</div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /section-inner -->
+</section>
+
+<!-- APPLY MODAL -->
+<div class="apply-overlay" id="applyOverlay" onclick="closeApplyOutside(event)">
+  <div class="apply-modal" id="applyModal">
+    <button class="apply-close" onclick="closeApply()">✕</button>
+    <div class="apply-role-badge" id="applyRoleBadge">🛗 Quick Fresh Rider</div>
+    <div class="apply-title" id="applyRoleTitle">Apply for Quick Fresh Rider</div>
+    <div class="apply-subtitle">No experience needed. We'll train you. Just be honest, punctual, and ready to hustle.</div>
+
+    <div class="apply-field-row">
+      <div class="apply-field">
+        <label>First Name</label>
+        <input type="text" id="applyFirstName" placeholder="Ravi">
+      </div>
+      <div class="apply-field">
+        <label>Last Name</label>
+        <input type="text" id="applyLastName" placeholder="Kumar">
+      </div>
+    </div>
+    <div class="apply-field">
+      <label>WhatsApp Number</label>
+      <input type="tel" id="applyPhone" placeholder="98765 43210" maxlength="10">
+    </div>
+    <div class="apply-field">
+      <label>Current Area / Locality in Hyderabad</label>
+      <input type="text" id="applyArea" placeholder="e.g. Gachibowli, Kondapur, Hitech City">
+    </div>
+    <div class="apply-field">
+      <label>Preferred Shift</label>
+      <select id="applyShift">
+        <option value="">Select shift</option>
+        <option>Morning (6AM – 2PM)</option>
+        <option>Evening (2PM – 10PM)</option>
+        <option>Full Day (6AM – 10PM)</option>
+        <option>Flexible / Part-time</option>
+      </select>
+    </div>
+    <div class="apply-field">
+      <label>Availability</label>
+      <select id="applyAvail">
+        <option value="">When can you start?</option>
+        <option>Immediately</option>
+        <option>Within 1 week</option>
+        <option>Within 2 weeks</option>
+      </select>
+    </div>
+    <div class="apply-field">
+      <label>Anything else? (optional)</label>
+      <textarea id="applyNote" placeholder="Tell us a bit about yourself — previous work, why you want to join, etc."></textarea>
+    </div>
+    <button class="apply-submit" onclick="handleApply()">Submit Application →</button>
+  </div>
+</div>
+
 <!-- CTA -->
 <section class="cta-section">
   <div class="section-inner">
@@ -2102,7 +2805,7 @@ body.day-mode .vc-title{color:var(--teal-xl);}
         <h4>Company</h4>
         <ul>
           <li><a href="#">About Us</a></li>
-          <li><a href="#">Careers</a></li>
+          <li><a href="#careers">Careers</a></li>
           <li><a href="#">Blog</a></li>
           <li><a href="#">Press</a></li>
         </ul>
@@ -2119,11 +2822,10 @@ body.day-mode .vc-title{color:var(--teal-xl);}
       <div class="footer-col">
         <h4>Contact Us</h4>
         <ul>
-          <li><a href="tel:9948023453">📞 9948023453</a></li>
           <li><a href="#">Saketh Bommidi</a></li>
-          <li><a href="/cdn-cgi/l/email-protection#d2a1b3b9b7a6bab0bdbfbfbbb6bb92b5bfb3bbbefcb1bdbf">✉️ <span class="__cf_email__" data-cfemail="5122303a342539333e3c3c38353811363c30383d7f323e3c">[email&#160;protected]</span></a></li>
-          <li style="margin-top:12px;"><a href="tel:7337063099">📞 7337063099</a></li>
-          <li><a href="#">Sai Dhanush</a></li>
+          <li><a href="tel:9948023453">📞 9948023453</a></li>
+          <li style="margin-top:12px;"><a href="#">Sai Dhanush</a></li>
+          <li><a href="tel:7337063099">📞 7337063099</a></li>
         </ul>
       </div>
     </div>
@@ -2496,18 +3198,78 @@ window.addEventListener('scroll', ()=>{ closeMobileMenu(); }, {passive:true});
 // ── FIX nav height ref for mobile ──
 (function fixNavHeight(){
   const setH = () => {
-    const h = document.getElementById('navbar').offsetHeight;
+    const navbar = document.getElementById('navbar');
+    const h = navbar.offsetHeight;
     document.documentElement.style.setProperty('--nav-h', h+'px');
+
+    // Ticker sits directly below fixed nav
     const ticker = document.querySelector('.ticker');
     if(ticker) ticker.style.marginTop = h+'px';
+
+    // Adjust hero height to fill remaining viewport cleanly
+    const tickerH = ticker ? ticker.offsetHeight : 41;
+    const hero = document.querySelector('.hero');
+    if(hero) {
+      hero.style.height = `calc(100vh - ${h}px - ${tickerH}px)`;
+    }
+
     const mMenu = document.getElementById('mobileMenu');
     if(mMenu) mMenu.style.top = h+'px';
   };
-  setH();
+  // Run after a tiny delay so ticker height is rendered
+  setTimeout(setH, 50);
   window.addEventListener('resize', setH, {passive:true});
 })();
 
-// ── TOUCH: prevent 3D tilt on touch devices ──
+// ═══════════════════════════════════════
+// CAREERS — APPLY MODAL
+// ═══════════════════════════════════════
+function openApply(roleName, roleIcon) {
+  const badge = document.getElementById('applyRoleBadge');
+  const title = document.getElementById('applyRoleTitle');
+  badge.textContent = roleIcon + ' ' + roleName;
+  title.textContent = 'Apply for ' + roleName;
+  document.getElementById('applyOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeApply() {
+  document.getElementById('applyOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+function closeApplyOutside(e) {
+  if (e.target === document.getElementById('applyOverlay')) closeApply();
+}
+function handleApply() {
+  const name  = document.getElementById('applyFirstName').value.trim();
+  const phone = document.getElementById('applyPhone').value.trim();
+  const area  = document.getElementById('applyArea').value.trim();
+  const shift = document.getElementById('applyShift').value;
+  const avail = document.getElementById('applyAvail').value;
+  const role  = document.getElementById('applyRoleTitle').textContent.replace('Apply for ','');
+
+  if (!name)  { showToast('❗ Please enter your first name'); return; }
+  if (phone.length < 10) { showToast('❗ Enter a valid 10-digit WhatsApp number'); return; }
+  if (!area)  { showToast('❗ Please enter your area in Hyderabad'); return; }
+  if (!shift) { showToast('❗ Please select a preferred shift'); return; }
+  if (!avail) { showToast('❗ Please select your availability'); return; }
+
+  closeApply();
+  showToast('🎉 Application submitted! We\'ll WhatsApp you within 24 hours.');
+
+  // Clear form
+  ['applyFirstName','applyLastName','applyPhone','applyArea','applyNote'].forEach(id => {
+    document.getElementById(id).value = '';
+  });
+  document.getElementById('applyShift').value = '';
+  document.getElementById('applyAvail').value = '';
+}
+
+// ESC closes apply modal too
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') { closeApply(); }
+});
+
+
 if(!window.matchMedia('(hover:hover)').matches){
   document.querySelectorAll('.feature-card,.testi-card,.product-card').forEach(card=>{
     card.onmousemove = null;
