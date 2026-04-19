@@ -62,6 +62,7 @@ body.day-mode nav.scrolled{
 
 /* Ticker — fresh green stripe */
 body.day-mode .ticker{
+  backdrop-filter:blur(12px);
   background:linear-gradient(90deg,rgba(0,137,123,0.07),rgba(0,200,170,0.1),rgba(0,137,123,0.07));
   border-bottom-color:rgba(0,137,123,0.12);
 }
@@ -264,6 +265,10 @@ body.intro-active{ overflow:hidden; }
   animation:iWordIn 1s cubic-bezier(0.34,1.4,0.64,1) 0.4s forwards;
   will-change:transform,opacity;
   user-select:none;
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  backface-visibility:hidden;
+  -webkit-backface-visibility:hidden;
 }
 @keyframes iWordIn{
   from{opacity:0;transform:translateY(18px) scale(0.78);}
@@ -489,8 +494,8 @@ body.day-mode .nav-links a:hover{color:var(--teal-xl);}
 /* ── TICKER ── */
 .ticker{
   background:rgba(0,137,123,0.12);border-bottom:1px solid rgba(0,137,123,0.2);
-  padding:10px 0;overflow:hidden;position:relative;z-index:50;
-  /* margin-top is set dynamically by JS to match nav height */
+  padding:10px 0;overflow:hidden;
+  position:relative;z-index:50;margin-top:72px;
   transition:background var(--theme-transition);
 }
 .ticker-inner{
@@ -508,11 +513,12 @@ body.day-mode .nav-links a:hover{color:var(--teal-xl);}
 /* ── HERO ── */
 .hero{
   position:relative;
-  /* height accounts for nav + ticker (~40px) */
-  height:calc(100vh - 72px - 41px);
-  min-height:520px;
+  min-height:calc(100vh - 72px - 41px);
+  height:auto;
   display:flex;align-items:center;
-  overflow:hidden;
+  overflow:visible;
+  padding-top:40px;
+  padding-bottom:80px;
 }
 .hero-bg{
   position:absolute;inset:0;
@@ -573,6 +579,7 @@ body.day-mode .btn-outline{color:var(--teal-xl);border-color:rgba(0,77,64,0.3);}
 .btn-outline:hover{border-color:var(--teal-l);color:var(--teal-l);}
 .hero-stats{
   display:flex;gap:32px;margin-top:48px;padding-top:36px;
+  padding-bottom:8px;
   border-top:1px solid rgba(255,255,255,0.08);
 }
 body.day-mode .hero-stats{border-top-color:rgba(0,77,64,0.12);}
@@ -1681,7 +1688,7 @@ body.day-mode .su-social-btn{background:rgba(255,255,255,0.6);}
 
 /* ══ SMOOTH SCROLL SNAP on mobile ══ */
 @media(max-width:768px){
-  html{scroll-padding-top:64px;}
+  html{scroll-padding-top:120px;}
 }
 @media(min-width:769px){
   html{scroll-padding-top:72px;}
@@ -1782,7 +1789,10 @@ body.day-mode .careers-perk{background:rgba(0,137,123,0.08);color:var(--teal-xl)
   position:relative;overflow:hidden;
   transition:all 0.4s cubic-bezier(0.34,1.56,0.64,1);
   cursor:pointer!important;
+  display:flex;flex-direction:column;
 }
+.career-card .career-list{flex:1;}
+.career-earn{margin-top:auto;}
 body.day-mode .career-card{background:rgba(255,255,255,0.75);border-color:rgba(0,137,123,0.15);}
 .career-card::before{
   content:'';position:absolute;inset:0;
@@ -1993,6 +2003,84 @@ body.day-mode .careers-process-title{color:var(--teal-xl);}
 body.day-mode .cp-label{color:var(--teal-xl);}
 .cp-desc{font-size:11px;color:var(--muted);line-height:1.5;}
 
+/* ── LOCATIONS SECTION ── */
+.locations-section{
+  padding:100px 5%;
+  background:var(--dark2);
+  position:relative;overflow:hidden;
+  transition:background var(--theme-transition);
+}
+.locations-section::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,var(--teal),transparent);
+}
+body.day-mode .locations-section{background:#edf8f5;}
+.locations-inner{max-width:1200px;margin:0 auto;}
+.store-grid{
+  display:grid;grid-template-columns:repeat(2,1fr);
+  gap:20px;margin-bottom:48px;
+}
+@media(max-width:560px){.store-grid{grid-template-columns:1fr;}}
+.store-card{
+  background:rgba(255,255,255,0.03);
+  border:1px solid rgba(0,137,123,0.18);
+  border-radius:20px;padding:24px;
+  cursor:pointer!important;
+  transition:all 0.3s cubic-bezier(0.34,1.56,0.64,1);
+  position:relative;
+}
+body.day-mode .store-card{background:#fff;border-color:rgba(0,137,123,0.15);}
+.store-card:hover,.store-card.active{
+  border-color:rgba(0,229,204,0.5);
+  transform:translateY(-4px);
+  box-shadow:0 12px 40px rgba(0,137,123,0.15);
+}
+.store-card.active::after{
+  content:'';position:absolute;bottom:-2px;left:50%;transform:translateX(-50%);
+  width:40px;height:3px;border-radius:2px;background:var(--accent);
+}
+.store-pin{
+  width:42px;height:42px;border-radius:14px;
+  background:rgba(0,137,123,0.15);
+  border:1px solid rgba(0,137,123,0.25);
+  display:flex;align-items:center;justify-content:center;
+  font-size:20px;margin-bottom:14px;transition:all 0.3s;
+}
+.store-card.active .store-pin,.store-card:hover .store-pin{background:var(--teal);}
+.store-name{
+  font-family:'Nunito',sans-serif;font-size:16px;font-weight:800;
+  color:var(--white);margin-bottom:6px;
+}
+body.day-mode .store-name{color:#004d40;}
+.store-addr{font-size:12px;color:var(--muted);line-height:1.6;margin-bottom:12px;}
+.store-meta{display:flex;gap:8px;flex-wrap:wrap;}
+.store-tag{
+  font-size:10px;font-weight:700;
+  background:rgba(0,137,123,0.12);color:var(--teal-l);
+  border-radius:20px;padding:3px 10px;letter-spacing:0.4px;
+}
+body.day-mode .store-tag{background:rgba(0,137,123,0.1);color:#00695c;}
+.store-open{color:#00e5cc!important;background:rgba(0,229,204,0.1)!important;}
+.map-wrapper{
+  border-radius:24px;overflow:hidden;
+  border:1px solid rgba(0,137,123,0.2);
+  box-shadow:0 16px 60px rgba(0,0,0,0.25);
+  position:relative;height:420px;
+}
+body.day-mode .map-wrapper{box-shadow:0 8px 40px rgba(0,137,123,0.12);}
+.map-wrapper iframe{width:100%;height:100%;border:none;display:block;}
+.map-open-btn{
+  position:absolute;bottom:16px;right:16px;
+  background:var(--teal);color:#fff;
+  border:none;border-radius:50px;
+  padding:10px 20px;font-size:13px;font-weight:700;
+  cursor:pointer!important;font-family:'Plus Jakarta Sans',sans-serif;
+  display:flex;align-items:center;gap:8px;
+  box-shadow:0 4px 20px rgba(0,137,123,0.4);
+  transition:all 0.25s;z-index:10;
+}
+.map-open-btn:hover{background:var(--teal-d);transform:translateY(-2px);}
+
 /* ── VENDING MACHINE BANNER ── */
 .vending-banner{
   background:linear-gradient(135deg,var(--dark2) 0%,var(--dark3) 60%,rgba(0,137,123,0.15) 100%);
@@ -2083,6 +2171,21 @@ body.day-mode .vc-title{color:var(--teal-xl);}
       <span id="intro-six">6</span><span id="intro-am">am</span><span id="intro-fresh">fresh</span><span id="intro-dot"></span>
     </div>
     <div id="intro-tagline">Start Fresh &nbsp;&middot;&nbsp; Stay Fresh</div>
+  <div id="intro-gated" style="
+    margin-top:14px;
+    font-family:'Plus Jakarta Sans',sans-serif;
+    font-size:clamp(9px,1.1vw,12px);
+    font-weight:600;letter-spacing:3px;text-transform:uppercase;
+    color:rgba(0,229,204,0.7);
+    opacity:0;
+    animation:iTagIn 0.8s ease 1.5s forwards;
+    white-space:nowrap;
+    display:flex;align-items:center;gap:10px;
+  ">
+    <span style="width:28px;height:1px;background:rgba(0,229,204,0.5);display:inline-block;"></span>
+    🏘️ Specially built for gated communities
+    <span style="width:28px;height:1px;background:rgba(0,229,204,0.5);display:inline-block;"></span>
+  </div>
   </div>
 
   <div id="intro-hint">
@@ -2100,6 +2203,7 @@ body.day-mode .vc-title{color:var(--teal-xl);}
   var overlay = document.getElementById('intro-overlay');
   var stage   = document.getElementById('intro-stage');
   var tagline = document.getElementById('intro-tagline');
+  var gated   = document.getElementById('intro-gated');
   var hint    = document.getElementById('intro-hint');
   var six     = document.getElementById('intro-six');
 
@@ -2141,6 +2245,7 @@ body.day-mode .vc-title{color:var(--teal-xl);}
     /* fade out text */
     var textFade = Math.max(0, 1 - p * 8);
     tagline.style.opacity = textFade;
+    if(gated) gated.style.opacity = textFade;
     hint.style.opacity    = textFade;
 
     /* fade overlay from 70% onward */
@@ -2227,6 +2332,7 @@ body.day-mode .vc-title{color:var(--teal-xl);}
     <div class="logo-dot"></div>
   </div>
   <div class="nav-links">
+    <a href="#locations">Stores</a>
     <a href="#products">Shop</a>
     <a href="#how">How it works</a>
     <a href="#schedule">Schedule</a>
@@ -2595,6 +2701,55 @@ body.day-mode .vc-title{color:var(--teal-xl);}
   </div>
 </div>
 
+<!-- LOCATIONS -->
+<section class="locations-section section" id="locations">
+  <div class="locations-inner">
+    <div class="reveal">
+      <div class="section-tag">Our Stores</div>
+      <h2 class="section-h2">Find Us <em>In Your Building.</em></h2>
+      <p class="section-sub">6am Fresh stores are embedded inside gated communities across Hyderabad. Click a store to see it on the map.</p>
+    </div>
+
+    <!-- 2-col grid for 2 stores -->
+    <div class="store-grid reveal" style="margin-top:48px;grid-template-columns:repeat(2,1fr);max-width:700px;margin-left:auto;margin-right:auto;">
+
+      <div class="store-card active reveal reveal-delay-1" onclick="showMap(this,'https://maps.google.com/maps?q=Sumadhura+Gardens+By+The+Brook,+Survey+5,+Sathamrai+Village,+Shamshabad,+Hyderabad,+Telangana+500052&output=embed','https://maps.app.goo.gl/HoZeERxUWYYBeu4v7')">
+        <div class="store-pin">📍</div>
+        <div class="store-name">Shamshabad Store</div>
+        <div class="store-addr">Sumadhura's Gardens By The Brook,<br>Sathamrai Village, Shamshabad,<br>Hyderabad – 500052</div>
+        <div class="store-meta">
+          <span class="store-tag store-open">● Open Now</span>
+          <span class="store-tag">6AM – 10PM</span>
+        </div>
+      </div>
+
+      <div class="store-card reveal reveal-delay-2" onclick="showMap(this,'https://maps.google.com/maps?q=The+Olympus+by+Sumadhura,+Financial+District,+Nanakramguda,+Hyderabad,+Telangana+500032&output=embed','https://maps.app.goo.gl/h1ZPgrqtSU3hgv9m6')">
+        <div class="store-pin">📍</div>
+        <div class="store-name">Gachibowli Store</div>
+        <div class="store-addr">The Olympus by Sumadhura,<br>Financial District, Nanakramguda,<br>Hyderabad – 500032</div>
+        <div class="store-meta">
+          <span class="store-tag store-open">● Open Now</span>
+          <span class="store-tag">6AM – 10PM</span>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="map-wrapper reveal" id="mapWrapper">
+      <iframe
+        id="storeMapFrame"
+        src="https://maps.google.com/maps?q=Sumadhura+Gardens+By+The+Brook,+Survey+5,+Sathamrai+Village,+Shamshabad,+Hyderabad,+Telangana+500052&output=embed"
+        allowfullscreen loading="lazy"
+        referrerpolicy="no-referrer-when-downgrade">
+      </iframe>
+      <button class="map-open-btn" onclick="openMapExternal()">
+        🗺️ Open in Google Maps
+      </button>
+    </div>
+
+  </div>
+</section>
+
 <!-- CAREERS -->
 <section class="careers-section section" id="careers">
   <div class="section-inner">
@@ -2725,44 +2880,25 @@ body.day-mode .vc-title{color:var(--teal-xl);}
 
     <div class="apply-field-row">
       <div class="apply-field">
-        <label>First Name</label>
+        <label>First Name *</label>
         <input type="text" id="applyFirstName" placeholder="Ravi">
       </div>
       <div class="apply-field">
-        <label>Last Name</label>
+        <label>Last Name *</label>
         <input type="text" id="applyLastName" placeholder="Kumar">
       </div>
     </div>
     <div class="apply-field">
-      <label>WhatsApp Number</label>
+      <label>Phone Number *</label>
       <input type="tel" id="applyPhone" placeholder="98765 43210" maxlength="10">
     </div>
     <div class="apply-field">
-      <label>Current Area / Locality in Hyderabad</label>
-      <input type="text" id="applyArea" placeholder="e.g. Gachibowli, Kondapur, Hitech City">
+      <label>Email ID *</label>
+      <input type="email" id="applyEmail" placeholder="ravi@gmail.com">
     </div>
     <div class="apply-field">
-      <label>Preferred Shift</label>
-      <select id="applyShift">
-        <option value="">Select shift</option>
-        <option>Morning (6AM – 2PM)</option>
-        <option>Evening (2PM – 10PM)</option>
-        <option>Full Day (6AM – 10PM)</option>
-        <option>Flexible / Part-time</option>
-      </select>
-    </div>
-    <div class="apply-field">
-      <label>Availability</label>
-      <select id="applyAvail">
-        <option value="">When can you start?</option>
-        <option>Immediately</option>
-        <option>Within 1 week</option>
-        <option>Within 2 weeks</option>
-      </select>
-    </div>
-    <div class="apply-field">
-      <label>Anything else? (optional)</label>
-      <textarea id="applyNote" placeholder="Tell us a bit about yourself — previous work, why you want to join, etc."></textarea>
+      <label>Role Applying For</label>
+      <input type="text" id="applyRoleField" readonly style="background:rgba(0,137,123,0.08);cursor:default!important;">
     </div>
     <button class="apply-submit" onclick="handleApply()">Submit Application →</button>
   </div>
@@ -3202,24 +3338,40 @@ window.addEventListener('scroll', ()=>{ closeMobileMenu(); }, {passive:true});
     const h = navbar.offsetHeight;
     document.documentElement.style.setProperty('--nav-h', h+'px');
 
-    // Ticker sits directly below fixed nav
+    // Ticker margin-top = nav height so it sits flush below fixed nav
     const ticker = document.querySelector('.ticker');
-    if(ticker) ticker.style.marginTop = h+'px';
-
-    // Adjust hero height to fill remaining viewport cleanly
     const tickerH = ticker ? ticker.offsetHeight : 41;
+    if(ticker) {
+      ticker.style.marginTop = h + 'px';
+    }
+
+    // Hero min-height
     const hero = document.querySelector('.hero');
     if(hero) {
-      hero.style.height = `calc(100vh - ${h}px - ${tickerH}px)`;
+      hero.style.minHeight = `calc(100vh - ${h}px - ${tickerH}px)`;
+      hero.style.height = 'auto';
     }
 
     const mMenu = document.getElementById('mobileMenu');
     if(mMenu) mMenu.style.top = h+'px';
   };
-  // Run after a tiny delay so ticker height is rendered
   setTimeout(setH, 50);
   window.addEventListener('resize', setH, {passive:true});
 })();
+
+// ═══════════════════════════════════════
+// STORE LOCATIONS — MAP SWITCHER
+// ═══════════════════════════════════════
+var _currentMapUrl = 'https://maps.app.goo.gl/HoZeERxUWYYBeu4v7';
+function showMap(card, embedUrl, externalUrl) {
+  document.querySelectorAll('.store-card').forEach(c => c.classList.remove('active'));
+  card.classList.add('active');
+  document.getElementById('storeMapFrame').src = embedUrl;
+  _currentMapUrl = externalUrl;
+}
+function openMapExternal() {
+  window.open(_currentMapUrl, '_blank');
+}
 
 // ═══════════════════════════════════════
 // CAREERS — APPLY MODAL
@@ -3227,8 +3379,10 @@ window.addEventListener('scroll', ()=>{ closeMobileMenu(); }, {passive:true});
 function openApply(roleName, roleIcon) {
   const badge = document.getElementById('applyRoleBadge');
   const title = document.getElementById('applyRoleTitle');
+  const roleField = document.getElementById('applyRoleField');
   badge.textContent = roleIcon + ' ' + roleName;
   title.textContent = 'Apply for ' + roleName;
+  if(roleField) roleField.value = roleName;
   document.getElementById('applyOverlay').classList.add('open');
   document.body.style.overflow = 'hidden';
 }
@@ -3240,28 +3394,28 @@ function closeApplyOutside(e) {
   if (e.target === document.getElementById('applyOverlay')) closeApply();
 }
 function handleApply() {
-  const name  = document.getElementById('applyFirstName').value.trim();
-  const phone = document.getElementById('applyPhone').value.trim();
-  const area  = document.getElementById('applyArea').value.trim();
-  const shift = document.getElementById('applyShift').value;
-  const avail = document.getElementById('applyAvail').value;
-  const role  = document.getElementById('applyRoleTitle').textContent.replace('Apply for ','');
+  const firstName = document.getElementById('applyFirstName').value.trim();
+  const lastName  = document.getElementById('applyLastName').value.trim();
+  const phone     = document.getElementById('applyPhone').value.trim();
+  const email     = document.getElementById('applyEmail').value.trim();
+  const role      = document.getElementById('applyRoleField').value.trim();
 
-  if (!name)  { showToast('❗ Please enter your first name'); return; }
-  if (phone.length < 10) { showToast('❗ Enter a valid 10-digit WhatsApp number'); return; }
-  if (!area)  { showToast('❗ Please enter your area in Hyderabad'); return; }
-  if (!shift) { showToast('❗ Please select a preferred shift'); return; }
-  if (!avail) { showToast('❗ Please select your availability'); return; }
+  if (!firstName) { showToast('❗ Please enter your first name'); return; }
+  if (!lastName)  { showToast('❗ Please enter your last name'); return; }
+  if (phone.length < 10) { showToast('❗ Enter a valid 10-digit phone number'); return; }
+  if (!email || !email.includes('@')) { showToast('❗ Please enter a valid email ID'); return; }
 
+  // Build Google Form prefill URL and open it
+  const formBase = 'https://forms.gle/zcSvA43zuHSUkdo49';
   closeApply();
-  showToast('🎉 Application submitted! We\'ll WhatsApp you within 24 hours.');
+  showToast('🎉 Redirecting to application form...');
+  setTimeout(() => { window.open(formBase, '_blank'); }, 800);
 
   // Clear form
-  ['applyFirstName','applyLastName','applyPhone','applyArea','applyNote'].forEach(id => {
-    document.getElementById(id).value = '';
+  ['applyFirstName','applyLastName','applyPhone','applyEmail'].forEach(id => {
+    const el = document.getElementById(id);
+    if(el) el.value = '';
   });
-  document.getElementById('applyShift').value = '';
-  document.getElementById('applyAvail').value = '';
 }
 
 // ESC closes apply modal too
