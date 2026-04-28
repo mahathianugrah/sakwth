@@ -613,7 +613,18 @@ body.day-mode .hero-stats{border-top-color:rgba(0,77,64,0.12);}
 .fc2{top:35%;right:5%;width:200px;animation:float2 7s ease-in-out infinite;}
 .fc3{bottom:10%;left:20%;width:240px;animation:float3 5s ease-in-out infinite;}
 
-/* 3D tilt on cards (applied via JS) */
+/* ── Performance: card fade-in via CSS animation ── */
+@keyframes cardFadeUp {
+  from { opacity:0; transform:translateY(24px) scale(0.97); }
+  to   { opacity:1; transform:translateY(0) scale(1); }
+}
+.card-fade-in {
+  animation: cardFadeUp 0.4s cubic-bezier(0.34,1.56,0.64,1) both;
+}
+/* GPU layers for parallax elements */
+.hero-bg, .hero-grid, .float-card {
+  will-change: transform;
+}
 .float-card{transform-style:preserve-3d;will-change:transform;}
 
 @keyframes float1{0%,100%{transform:translateY(0) rotate(-2deg) rotateX(3deg);}50%{transform:translateY(-20px) rotate(-1deg) rotateX(6deg);}}
@@ -2347,8 +2358,8 @@ body.day-mode .vc-title{color:var(--teal-xl);}
     <button class="nav-theme-icon" id="themeToggle" onclick="toggleTheme()" title="Toggle day/night">
       <span id="themeEmoji">☀️</span>
     </button>
-    <!-- SIGN UP -->
-    <button class="nav-signup-btn" onclick="openSignup()">Sign Up</button>
+    <!-- ORDER NOW -->
+    <a class="nav-signup-btn" href="https://www.instagram.com/6am_fresh?igsh=MTQ2eHQ0czUwbWVwZA%3D%3D&utm_source=qr" target="_blank" rel="noopener" style="text-decoration:none;">Order Now</a>
     <!-- BURGER -->
     <div class="nav-burger" id="navBurger" onclick="toggleMobileMenu()">
       <span></span><span></span><span></span>
@@ -2364,7 +2375,7 @@ body.day-mode .vc-title{color:var(--teal-xl);}
   <a href="#app" onclick="closeMobileMenu()">📱 Download App</a>
   <a href="#community" onclick="closeMobileMenu()">🌿 Community</a>
   <div class="mobile-menu-footer">
-    <button style="background:var(--teal);color:#fff;" onclick="openSignup();closeMobileMenu()">Sign Up Free</button>
+    <a href="https://www.instagram.com/6am_fresh?igsh=MTQ2eHQ0czUwbWVwZA%3D%3D&utm_source=qr" target="_blank" rel="noopener" style="display:block;background:var(--teal);color:#fff;text-align:center;padding:12px 20px;border-radius:12px;text-decoration:none;font-weight:600;" onclick="closeMobileMenu()">Order Now</a>
   </div>
 </div>
 
@@ -2975,7 +2986,7 @@ body.day-mode .vc-title{color:var(--teal-xl);}
   </div>
 </footer>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+<script>
 // ═══════════════════════════════════════
 // CURSOR SYSTEM — fixed & clean
 // ═══════════════════════════════════════
@@ -3076,23 +3087,27 @@ buildTicker();
 // ═══════════════════════════════════════
 const hero = document.querySelector('.hero');
 if(hero) {
+  let _heroTicking = false;
   hero.addEventListener('mousemove', e => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = (e.clientX - rect.left) / rect.width - 0.5;
-    const y = (e.clientY - rect.top) / rect.height - 0.5;
-    document.querySelectorAll('.float-card').forEach((card, i) => {
-      const depth = (i + 1) * 8;
-      const rotX = y * 12;
-      const rotY = x * 12;
-      card.style.transform = `translate(${x*depth}px,${y*depth}px) rotateX(${-rotX}deg) rotateY(${rotY}deg)`;
+    if (_heroTicking) return;
+    _heroTicking = true;
+    requestAnimationFrame(() => {
+      const rect = hero.getBoundingClientRect();
+      const x = (e.clientX - rect.left) / rect.width - 0.5;
+      const y = (e.clientY - rect.top) / rect.height - 0.5;
+      document.querySelectorAll('.float-card').forEach((card, i) => {
+        const depth = (i + 1) * 8;
+        card.style.transform = `translate(${x*depth}px,${y*depth}px) rotateX(${-y*12}deg) rotateY(${x*12}deg)`;
+      });
+      const hbg = document.querySelector('.hero-bg');
+      if (hbg) hbg.style.transform = `translate(${x*20}px,${y*20}px)`;
+      _heroTicking = false;
     });
-    document.querySelector('.hero-bg').style.transform = `translate(${x*20}px,${y*20}px)`;
-  });
+  }, {passive: true});
   hero.addEventListener('mouseleave', () => {
-    document.querySelectorAll('.float-card').forEach(card => {
-      card.style.transform = '';
-    });
-    document.querySelector('.hero-bg').style.transform = '';
+    document.querySelectorAll('.float-card').forEach(card => { card.style.transform = ''; });
+    const hbg = document.querySelector('.hero-bg');
+    if (hbg) hbg.style.transform = '';
   });
 }
 
@@ -3120,11 +3135,21 @@ setTimeout(() => {
 // ═══════════════════════════════════════
 // SCROLL NAV
 // ═══════════════════════════════════════
+// Throttled scroll handler using RAF
+let _scrollTicking = false;
 window.addEventListener('scroll', () => {
-  document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 50);
-  document.querySelector('.hero-bg').style.transform = `translateY(${window.scrollY * 0.3}px)`;
-  document.querySelector('.hero-grid').style.transform = `translateY(${window.scrollY * 0.2}px)`;
-});
+  if (_scrollTicking) return;
+  _scrollTicking = true;
+  requestAnimationFrame(() => {
+    const sy = window.scrollY;
+    document.getElementById('navbar').classList.toggle('scrolled', sy > 50);
+    const heroBg = document.querySelector('.hero-bg');
+    const heroGrid = document.querySelector('.hero-grid');
+    if (heroBg) heroBg.style.transform = `translateY(${sy * 0.3}px)`;
+    if (heroGrid) heroGrid.style.transform = `translateY(${sy * 0.2}px)`;
+    _scrollTicking = false;
+  });
+}, {passive: true});
 
 // ═══════════════════════════════════════
 // REVEAL ON SCROLL
@@ -3217,13 +3242,8 @@ function renderProducts(cat) {
     </div>`;
   }).join('');
   grid.querySelectorAll('.product-card').forEach((el, i) => {
-    el.style.opacity = '0';
-    el.style.transform = 'translateY(24px) scale(0.97)';
-    setTimeout(() => {
-      el.style.transition = 'all 0.4s cubic-bezier(0.34,1.56,0.64,1)';
-      el.style.opacity = '1';
-      el.style.transform = '';
-    }, i * 40 + 50);
+    el.style.animationDelay = `${i * 40}ms`;
+    el.classList.add('card-fade-in');
   });
 }
 
@@ -3249,12 +3269,19 @@ function scrollToTop() {
 // 3D PARALLAX on feature cards
 // ═══════════════════════════════════════
 document.querySelectorAll('.feature-card,.testi-card,.product-card').forEach(card => {
+  let _cardTicking = false;
+  card.style.willChange = 'transform';
   card.addEventListener('mousemove', e => {
-    const rect = card.getBoundingClientRect();
-    const x = (e.clientX - rect.left) / rect.width - 0.5;
-    const y = (e.clientY - rect.top) / rect.height - 0.5;
-    card.style.transform = `translateY(-6px) rotateX(${-y*8}deg) rotateY(${x*8}deg) scale(1.02)`;
-  });
+    if (_cardTicking) return;
+    _cardTicking = true;
+    requestAnimationFrame(() => {
+      const rect = card.getBoundingClientRect();
+      const x = (e.clientX - rect.left) / rect.width - 0.5;
+      const y = (e.clientY - rect.top) / rect.height - 0.5;
+      card.style.transform = `translateY(-6px) rotateX(${-y*8}deg) rotateY(${x*8}deg) scale(1.02)`;
+      _cardTicking = false;
+    });
+  }, {passive: true});
   card.addEventListener('mouseleave', () => {
     card.style.transform = '';
   });
@@ -3408,17 +3435,26 @@ function handleApply() {
   if (phone.length < 10) { showToast('❗ Enter a valid 10-digit phone number'); return; }
   if (!email || !email.includes('@')) { showToast('❗ Please enter a valid email ID'); return; }
 
-  // Build Google Form prefill URL and open it
-  const formBase = 'https://forms.gle/zcSvA43zuHSUkdo49';
-  closeApply();
-  showToast('🎉 Redirecting to application form...');
-  setTimeout(() => { window.open(formBase, '_blank'); }, 800);
+  // Build WhatsApp message with application details
+  const msg =
+    `🌿 *New Job Application – 6am Fresh*\n\n` +
+    `👤 *Name:* ${firstName} ${lastName}\n` +
+    `📱 *Phone:* ${phone}\n` +
+    `📧 *Email:* ${email}\n` +
+    `💼 *Role:* ${role || 'Not specified'}\n\n` +
+    `_Submitted via 6amfresh.com_`;
+
+  const waURL = `https://wa.me/919948023453?text=${encodeURIComponent(msg)}`;
 
   // Clear form
   ['applyFirstName','applyLastName','applyPhone','applyEmail'].forEach(id => {
     const el = document.getElementById(id);
     if(el) el.value = '';
   });
+
+  closeApply();
+  showToast('🎉 Opening WhatsApp...');
+  window.location.href = waURL;
 }
 
 // ESC closes apply modal too
